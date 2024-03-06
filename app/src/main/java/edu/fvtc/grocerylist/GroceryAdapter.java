@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class  GroceryAdapter extends RecyclerView.Adapter{
     private ArrayList<GroceryItem> groceryItemData;
 
-    private ArrayList<Integer> checkedGroceries;
+    private ArrayList<GroceryItem> checkedGroceries = new ArrayList<>();
     private View.OnClickListener onItemClickListener;
 
 
@@ -61,7 +61,7 @@ public class  GroceryAdapter extends RecyclerView.Adapter{
         parentContext = context;
     }
 
-    public ArrayList<Integer> getCheckedGroceries()
+    public ArrayList<GroceryItem> getCheckedGroceries()
     {
         return checkedGroceries;
     }
@@ -80,22 +80,27 @@ public class  GroceryAdapter extends RecyclerView.Adapter{
         return new GroceryViewHolder(v);
     }
 
+    @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Log.d(TAG, "onBindViewHolder: " + groceryItemData.get(position));
         GroceryViewHolder groceryViewHolder = (GroceryViewHolder) holder;
-        groceryViewHolder.getTvGroceryName().setText(groceryItemData.get(position).getDescription());
-        groceryViewHolder.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener())
-            @Override
-        public void setOnCheckedChangeListener(CompoundButton buttonView, boolean isChecked) {
-            if (isChecked)
-            {
-                checkedGroceries.add(position);
-            }else {
-                checkedGroceries.remove(position);
-            }
-        }
-    }
+        groceryViewHolder.getTvGroceryName().setText(groceryItemData.get(position).getName());
 
+        // Set the state of the CheckBox based on the item's properties
+        groceryViewHolder.getCbIsOnShopList().setChecked(groceryItemData.get(position).getIsOnShoppingList() == 1);
+
+        // Handle the CheckBox state change
+        groceryViewHolder.getCbIsOnShopList().setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                // Update the item's properties based on the CheckBox state
+                groceryItemData.get(position).setIsOnShoppingList(isChecked ? 1 : 0);
+
+                // Notify any listeners that the data has changed
+                notifyItemChanged(position);
+            }
+        });
+    }
     @Override
     public int getItemCount() {
         return groceryItemData.size();

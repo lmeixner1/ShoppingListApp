@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity  {
@@ -21,7 +22,7 @@ public class MainActivity extends AppCompatActivity  {
     public static final String XMLFILENAME = "data.xml";
 
     ArrayList<GroceryItem> masterList;
-    ArrayList<GroceryItem> shoppingCartList;
+    ArrayList<Integer> checkedGroceries;
 
     Object buttonView;
     CheckBox checkBox;
@@ -56,6 +57,10 @@ public class MainActivity extends AppCompatActivity  {
             groceries.add(groceryItem.toString());
         }
 
+        ShowMasterList();
+
+    }
+    private void ShowMasterList(){
         //Bind the Recyclerview
         RecyclerView rvGroceries = findViewById(R.id.rvGrocerys);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
@@ -63,9 +68,7 @@ public class MainActivity extends AppCompatActivity  {
         GroceryAdapter groceryAdapter = new GroceryAdapter(masterList, this);
         groceryAdapter.setOnItemClickListener(onClickListener);
         rvGroceries.setAdapter(groceryAdapter);
-
     }
-
     private void createGroceries() {
 
         masterList = new ArrayList<GroceryItem>();
@@ -76,27 +79,12 @@ public class MainActivity extends AppCompatActivity  {
         masterList.add(new GroceryItem("AlmondJoy", 0,0));
         masterList.add(new GroceryItem( "MilkyWay", 0,0));
 
-        shoppingCartList = new ArrayList<GroceryItem>();
+
     }
+    public ArrayList<Integer> getCheckedGroceriesList() {
 
-    private void ShowMasterList()
-    {
-        RecyclerView rvGroceries = findViewById(R.id.rvGrocerys);
-        GroceryAdapter adapter = new GroceryAdapter(masterList, this);
-        adapter.setOnItemClickListener(onClickListener); // Set item click listener
-        rvGroceries.setAdapter(adapter);
+        return checkedGroceries;
     }
-
-    private void ShowShoppingList()
-    {
-
-        RecyclerView rvGroceries = findViewById(R.id.rvGrocerys);
-        GroceryAdapter adapter = new GroceryAdapter(shoppingCartList, this);
-        adapter.setOnItemClickListener(onClickListener); // Set item click listener
-        rvGroceries.setAdapter(adapter);
-    }
-
-
     public boolean onCreateOptionsMenu(Menu menu)
     {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -117,6 +105,7 @@ public class MainActivity extends AppCompatActivity  {
         {
             Log.d(TAG, "onOptionsItemSelected: " + item.getTitle());
             ShowShoppingList();
+
         }
         else if (id == R.id.action_add_item)
         {
@@ -135,11 +124,34 @@ public class MainActivity extends AppCompatActivity  {
         return super.onOptionsItemSelected(item);
     }
 
+    private void ShowShoppingList() {
+        ArrayList<GroceryItem> shoppingListItems = new ArrayList<>();
+        for (GroceryItem item : masterList)
+        {
+            if (item.getIsOnShoppingList() == 1)
+            {
+                shoppingListItems.add(item);
+            }
+        }
 
-    private void SaveData() {
-        WriteTextFile();
-        WriteXMLFile();
+        //Bind the Recyclerview
+        RecyclerView rvGroceries = findViewById(R.id.rvGrocerys);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        rvGroceries.setLayoutManager(layoutManager);
+
+        GroceryAdapter groceryAdapter = new GroceryAdapter(shoppingListItems, this);
+        rvGroceries.setAdapter(groceryAdapter);
+
+        // Log the contents of shoppingListItems
+        for (GroceryItem item : shoppingListItems) {
+            Log.d(TAG, "Shopping List Item: " + item.getName());
+        }
     }
+
+   private void SaveData() {
+       WriteTextFile();
+        WriteXMLFile();
+   }
 
     private void LoadData() {
         ReadTextFile();
@@ -196,7 +208,7 @@ public class MainActivity extends AppCompatActivity  {
                         data[0],
                         Integer.parseInt(data[1]),
                         Integer.parseInt(data[2])));
-                Log.d(TAG, "ReadTextFile: " + masterList.get(masterList.size() - 1).getDescription());
+                Log.d(TAG, "ReadTextFile: " + masterList.get(masterList.size() - 1).getName());
             }
             Log.d(TAG, "ReadTextFile: " + masterList.size());
 

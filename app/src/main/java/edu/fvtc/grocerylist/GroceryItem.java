@@ -3,10 +3,17 @@ package edu.fvtc.grocerylist;
 public class GroceryItem
 {
     //Variables
-    private int Id;
-    private String Description;
-    private int IsOnShoppingList;
-    private int IsInCart;
+    private Integer Id;
+    private String Name;
+    private Integer IsOnShoppingList;
+    private Integer IsInCart;
+
+    public GroceryItem(String name, int isOnShoppingList, int isInCart)
+    {
+        this.Name = name;
+        this.IsOnShoppingList = isOnShoppingList;
+        this.IsInCart = isInCart;
+    }
 
     public int getId() {
         return Id;
@@ -16,23 +23,23 @@ public class GroceryItem
         Id = id;
     }
 
-    public String getDescription() {
-        return Description;
+    public String getName() {
+        return Name;
     }
 
-    public void setDescription(String description) {
-        Description = description;
+    public void setName(String name) {
+        Name = name;
     }
 
 
-    public Integer getOnShoppingList(Integer isOnShoppingList) {
+    public Integer getIsOnShoppingList()
+    {
         return IsOnShoppingList;
     }
 
-    public void setOnShoppingList(Integer isOnShoppingList) {
-        IsOnShoppingList = isOnShoppingList;
+    public void setIsOnShoppingList(int isOnShoppingList) {
+        this.IsOnShoppingList = isOnShoppingList;
     }
-
 
     public Integer getIsInCart() {
         return IsInCart;
@@ -43,15 +50,8 @@ public class GroceryItem
     }
 
 
-    public GroceryItem(String description, int isOnShoppingList, int isInCart)
-    {
-        this.Description = description;
-        this.IsOnShoppingList = isOnShoppingList;
-        this.IsInCart = isInCart;
-    }
-
     public String toString(){
-        return Description + "|" + IsOnShoppingList + "|" + IsInCart;
+        return Name + "|" + IsOnShoppingList + "|" + IsInCart;
     }
 }
 
