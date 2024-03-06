@@ -2,6 +2,12 @@ package edu.fvtc.grocerylist;
 
 public class GroceryItem
 {
+    //Variables
+    private int Id;
+    private String Description;
+    private int IsOnShoppingList;
+    private int IsInCart;
+
     public int getId() {
         return Id;
     }
@@ -18,8 +24,6 @@ public class GroceryItem
         Description = description;
     }
 
-    private int Id;
-    private String Description;
 
     public Integer getOnShoppingList(Integer isOnShoppingList) {
         return IsOnShoppingList;
@@ -29,7 +33,6 @@ public class GroceryItem
         IsOnShoppingList = isOnShoppingList;
     }
 
-    private int IsOnShoppingList;
 
     public Integer getIsInCart() {
         return IsInCart;
@@ -38,8 +41,6 @@ public class GroceryItem
     public void setIsInCart(Integer isInCart) {
         IsInCart = isInCart;
     }
-
-    private int IsInCart;
 
 
     public GroceryItem(String description, int isOnShoppingList, int isInCart)

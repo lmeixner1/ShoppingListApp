@@ -14,7 +14,7 @@ import android.widget.CompoundButton;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  {
     public static final String TAG = "MainActivity";
     public static final String FILENAME = "data.txt";
 
@@ -22,6 +22,11 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<GroceryItem> masterList;
     ArrayList<GroceryItem> shoppingCartList;
+
+    Object buttonView;
+    CheckBox checkBox;
+
+    Boolean isChecked = false;
 
     private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
@@ -57,13 +62,9 @@ public class MainActivity extends AppCompatActivity {
         rvGroceries.setLayoutManager(layoutManager);
         GroceryAdapter groceryAdapter = new GroceryAdapter(masterList, this);
         groceryAdapter.setOnItemClickListener(onClickListener);
-
         rvGroceries.setAdapter(groceryAdapter);
 
-        Log.d(TAG, "onCreate: ");
-
     }
-
 
     private void createGroceries() {
 

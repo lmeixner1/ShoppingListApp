@@ -16,6 +16,8 @@ import java.util.ArrayList;
 
 public class  GroceryAdapter extends RecyclerView.Adapter{
     private ArrayList<GroceryItem> groceryItemData;
+
+    private ArrayList<Integer> checkedGroceries;
     private View.OnClickListener onItemClickListener;
 
 
@@ -24,14 +26,15 @@ public class  GroceryAdapter extends RecyclerView.Adapter{
 
     private Context parentContext;
 
+
     public class GroceryViewHolder extends RecyclerView.ViewHolder{
 
-        public CheckBox cbIsInShopList;
+        public CheckBox cbIsOnShopList;
         public TextView tvDescription;
         private View.OnClickListener onClickListener;
         public GroceryViewHolder(@NonNull View itemView) {
             super(itemView);
-            cbIsInShopList = itemView.findViewById(R.id.cbIsInShopList);
+            cbIsOnShopList = itemView.findViewById(R.id.cbIsOnShopList);
             tvDescription = itemView.findViewById(R.id.tvDescription);
             // Code involved with clicking an item in the list
             itemView.setTag(this);
@@ -44,10 +47,11 @@ public class  GroceryAdapter extends RecyclerView.Adapter{
             return tvDescription;
         }
 
-        public CheckBox getCbIsInShopList()
+        public CheckBox getCbIsOnShopList()
         {
-            return cbIsInShopList;
+            return cbIsOnShopList;
         }
+
 
     }
     public GroceryAdapter(ArrayList<GroceryItem> data, Context context)
@@ -57,13 +61,17 @@ public class  GroceryAdapter extends RecyclerView.Adapter{
         parentContext = context;
     }
 
+    public ArrayList<Integer> getCheckedGroceries()
+    {
+        return checkedGroceries;
+    }
+
     public void setOnItemClickListener(View.OnClickListener itemClickListener)
     {
         Log.d(TAG, "setOnItemClickListener: ");
         onItemClickListener = itemClickListener;
 
     }
-
 
     @NonNull
     @Override
@@ -72,12 +80,20 @@ public class  GroceryAdapter extends RecyclerView.Adapter{
         return new GroceryViewHolder(v);
     }
 
-    @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Log.d(TAG, "onBindViewHolder: " + groceryItemData.get(position));
         GroceryViewHolder groceryViewHolder = (GroceryViewHolder) holder;
         groceryViewHolder.getTvGroceryName().setText(groceryItemData.get(position).getDescription());
-
+        groceryViewHolder.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener())
+            @Override
+        public void setOnCheckedChangeListener(CompoundButton buttonView, boolean isChecked) {
+            if (isChecked)
+            {
+                checkedGroceries.add(position);
+            }else {
+                checkedGroceries.remove(position);
+            }
+        }
     }
 
     @Override
