@@ -4,15 +4,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.Layout;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
+import android.widget.EditText;
 
-import java.lang.reflect.Array;
+
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity  {
@@ -22,12 +25,8 @@ public class MainActivity extends AppCompatActivity  {
     public static final String XMLFILENAME = "data.xml";
 
     ArrayList<GroceryItem> masterList;
-    ArrayList<Integer> checkedGroceries;
 
-    Object buttonView;
-    CheckBox checkBox;
-
-    Boolean isChecked = false;
+    private boolean isShoppingListShown = false;
 
     private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
@@ -35,7 +34,7 @@ public class MainActivity extends AppCompatActivity  {
             RecyclerView.ViewHolder viewHolder = (RecyclerView.ViewHolder) v.getTag();
             // Use the index to get an actor
             int position = viewHolder.getAdapterPosition();
-            int id = masterList.get(position).getId();
+            //int id = masterList.get(position).getId();
             GroceryItem groceryItem = masterList.get(position);
             Log.d(TAG, "onClick: " + groceryItem.toString());
 
@@ -69,6 +68,32 @@ public class MainActivity extends AppCompatActivity  {
         groceryAdapter.setOnItemClickListener(onClickListener);
         rvGroceries.setAdapter(groceryAdapter);
     }
+
+    private void ShowShoppingList() {
+        isShoppingListShown = true; // used in dialog to determine what is being shown
+
+        ArrayList<GroceryItem> shoppingListItems = new ArrayList<>();
+        for (GroceryItem item : masterList)
+        {
+            if (item.getIsOnShoppingList() == 1)
+            {
+                shoppingListItems.add(item);
+            }
+        }
+
+        //Bind the Recyclerview
+        RecyclerView rvGroceries = findViewById(R.id.rvGrocerys);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        rvGroceries.setLayoutManager(layoutManager);
+
+        GroceryAdapter groceryAdapter = new GroceryAdapter(shoppingListItems, this);
+        rvGroceries.setAdapter(groceryAdapter);
+
+        // Log the contents of shoppingListItems
+        for (GroceryItem item : shoppingListItems) {
+            Log.d(TAG, "Shopping List Item: " + item.getName());
+        }
+    }
     private void createGroceries() {
 
         masterList = new ArrayList<GroceryItem>();
@@ -80,10 +105,6 @@ public class MainActivity extends AppCompatActivity  {
         masterList.add(new GroceryItem( "MilkyWay", 0,0));
 
 
-    }
-    public ArrayList<Integer> getCheckedGroceriesList() {
-
-        return checkedGroceries;
     }
     public boolean onCreateOptionsMenu(Menu menu)
     {
@@ -110,6 +131,7 @@ public class MainActivity extends AppCompatActivity  {
         else if (id == R.id.action_add_item)
         {
             Log.d(TAG, "onOptionsItemSelected: " + item.getTitle());
+            addItemDialog();
             SaveData();
         }
         else if (id == R.id.action_clear_all)
@@ -124,28 +146,37 @@ public class MainActivity extends AppCompatActivity  {
         return super.onOptionsItemSelected(item);
     }
 
-    private void ShowShoppingList() {
-        ArrayList<GroceryItem> shoppingListItems = new ArrayList<>();
-        for (GroceryItem item : masterList)
-        {
-            if (item.getIsOnShoppingList() == 1)
-            {
-                shoppingListItems.add(item);
-            }
-        }
+    private void addItemDialog() {
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+        final View addItemView = layoutInflater.inflate(R.layout.additem, null);
 
-        //Bind the Recyclerview
-        RecyclerView rvGroceries = findViewById(R.id.rvGrocerys);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        rvGroceries.setLayoutManager(layoutManager);
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.add_item)
+                .setView(addItemView)
+                .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.d(TAG, "onClick: Ok");
+                        EditText etAddItem = addItemView.findViewById(R.id.etAddItem);
+                        String item = etAddItem.getText().toString();
 
-        GroceryAdapter groceryAdapter = new GroceryAdapter(shoppingListItems, this);
-        rvGroceries.setAdapter(groceryAdapter);
+                        if (isShoppingListShown)
+                        {
+                            masterList.add(new GroceryItem(item, 1, 0));
+                        } else
+                        {
+                            masterList.add(new GroceryItem(item, 0, 0));
+                            ShowMasterList();
+                        }
 
-        // Log the contents of shoppingListItems
-        for (GroceryItem item : shoppingListItems) {
-            Log.d(TAG, "Shopping List Item: " + item.getName());
-        }
+                    }
+                })
+                .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.d(TAG, "onClick: Cancel");
+                    }
+                }).show();
     }
 
    private void SaveData() {

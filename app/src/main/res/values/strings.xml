@@ -8,4 +8,7 @@
     <string name="add_item">Add Item</string>
     <string name="clear_all">Clear All</string>
     <string name="delete">Delete Checked</string>
+    <string name="add_your_grocery_item">Add your grocery item</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
 </resources>
