@@ -63,44 +63,7 @@ public class MainActivity extends AppCompatActivity  {
         ShowMasterList();
         Log.d(TAG, "onCreate: isShoppingList Shown = " + isShoppingListShown);
     }
-    private void ShowMasterList(){
-        Log.d(TAG, "ShowMasterList: isShoppingListShown = " + isShoppingListShown);
-        //Bind the Recyclerview
-        RecyclerView rvGroceries = findViewById(R.id.rvGrocerys);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        rvGroceries.setLayoutManager(layoutManager);
-        GroceryAdapter groceryAdapter = new GroceryAdapter(masterList, this);
-        groceryAdapter.setOnItemClickListener(onClickListener);
-        rvGroceries.setAdapter(groceryAdapter);
-    }
 
-    private void ShowShoppingList() {
-        isShoppingListShown = true; // used in dialog to determine what is being shown
-
-        Log.d(TAG, "ShowShoppingList: isShoppingListShown = " + isShoppingListShown);
-
-
-        for (GroceryItem item : masterList)
-        {
-            if (item.getIsOnShoppingList() == 1)
-            {
-                shoppingListItems.add(item);
-            }
-        }
-
-        //Bind the Recyclerview
-        RecyclerView rvGroceries = findViewById(R.id.rvGrocerys);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        rvGroceries.setLayoutManager(layoutManager);
-
-        GroceryAdapter groceryAdapter = new GroceryAdapter(shoppingListItems, this);
-        rvGroceries.setAdapter(groceryAdapter);
-
-        // Log the contents of shoppingListItems
-        for (GroceryItem item : shoppingListItems) {
-            Log.d(TAG, "Shopping List Item: " + item.getDescription());
-        }
-    }
     private void createGroceries() {
 
         masterList = new ArrayList<GroceryItem>();
@@ -110,8 +73,6 @@ public class MainActivity extends AppCompatActivity  {
         masterList.add(new GroceryItem("Red Bull", 0, 0));
         masterList.add(new GroceryItem("AlmondJoy", 0,0));
         masterList.add(new GroceryItem( "MilkyWay", 0,0));
-
-
     }
     public boolean onCreateOptionsMenu(Menu menu)
     {
@@ -126,12 +87,14 @@ public class MainActivity extends AppCompatActivity  {
 
         if(id == R.id.action_showMasterList)
         {
+            setTitle("Master List");
             Log.d(TAG, "onOptionsItemSelected: " + item.getTitle());
             isShoppingListShown = false;
             ShowMasterList();
         }
         else if (id == R.id.action_showShopList)
         {
+            setTitle("Shopping List");
             Log.d(TAG, "onOptionsItemSelected: " + item.getTitle());
             ShowShoppingList();
 
@@ -148,10 +111,68 @@ public class MainActivity extends AppCompatActivity  {
             ClearAll();
         } else {
             Log.d(TAG, "onOptionsItemSelected: " + item.getTitle());
-            //DeleteChecked();
+            DeleteChecked();
             SaveData();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void ShowMasterList(){
+        setTitle("Master List");
+        Log.d(TAG, "ShowMasterList: isShoppingListShown = " + isShoppingListShown);
+        //Bind the Recyclerview
+        RecyclerView rvGroceries = findViewById(R.id.rvGrocerys);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        rvGroceries.setLayoutManager(layoutManager);
+        GroceryAdapter groceryAdapter = new GroceryAdapter(masterList, this);
+        groceryAdapter.setOnItemClickListener(onClickListener);
+        rvGroceries.setAdapter(groceryAdapter);
+    }
+
+    private void ShowShoppingList() {
+
+        isShoppingListShown = true;
+
+        for (GroceryItem item : masterList)
+        {
+            if (item.getIsOnShoppingList() == 1)
+            {
+                shoppingListItems.add(item);
+            }
+        }
+
+        //Bind the Recyclerview
+        RecyclerView rvGroceries = findViewById(R.id.rvGrocerys);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        rvGroceries.setLayoutManager(layoutManager);
+
+        GroceryAdapter groceryAdapter = new GroceryAdapter(shoppingListItems, this);
+        rvGroceries.setAdapter(groceryAdapter);
+    }
+
+    private void DeleteChecked() {
+        shoppingListItems.clear();
+        for (int i = masterList.size() - 1; i >= 0; i--) {
+            GroceryItem item = masterList.get(i);
+            boolean isChecked = item.getIsOnShoppingList() == 1;
+
+            if (isShoppingListShown && isChecked) {
+                // Remove from shopping list only
+                shoppingListItems.remove(item);
+                item.setIsOnShoppingList(0);
+
+            } else if (!isShoppingListShown && isChecked) {
+                // Remove from master list only
+                masterList.remove(i);
+            }
+        }
+
+        // Update the view
+        if(isShoppingListShown) {
+            ShowShoppingList();
+        } else {
+            ShowMasterList();
+        }
     }
 
     private void ClearAll() {
@@ -159,7 +180,14 @@ public class MainActivity extends AppCompatActivity  {
         {
             item.setIsOnShoppingList(0);
         }
-        ShowMasterList();
+
+        if(isShoppingListShown)
+        {
+            ShowShoppingList();
+        }
+        else {
+            ShowMasterList();
+        }
     }
 
 
@@ -201,10 +229,10 @@ public class MainActivity extends AppCompatActivity  {
 
     }
 
-   private void SaveData() {
+    private void SaveData() {
         WriteTextFile();
         WriteXMLFile();
-   }
+    }
 
     private void LoadData() {
         ReadTextFile();

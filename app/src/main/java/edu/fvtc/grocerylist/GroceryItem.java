@@ -37,9 +37,7 @@ public class GroceryItem
         return IsOnShoppingList;
     }
 
-    public void setIsOnShoppingList(int isOnShoppingList) {
-        this.IsOnShoppingList = isOnShoppingList;
-    }
+    public void setIsOnShoppingList(int isOnShoppingList) {IsOnShoppingList = isOnShoppingList;}
 
     public Integer getIsInCart() {
         return IsInCart;
