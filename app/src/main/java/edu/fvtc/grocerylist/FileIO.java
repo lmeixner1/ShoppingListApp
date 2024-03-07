@@ -135,7 +135,7 @@ public class FileIO {
             {
                 serializer.startTag("", "grocery");
                 serializer.attribute("", "id", String.valueOf(groceryItem.getId()));
-                serializer.attribute("", "groceryName", String.valueOf(groceryItem.getName()));
+                serializer.attribute("", "groceryName", String.valueOf(groceryItem.getDescription()));
                 serializer.endTag("", "grocery");
                 Log.d(TAG, "WriteXMLFile: ");
             }

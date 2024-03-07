@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity  {
 
         // Log the contents of shoppingListItems
         for (GroceryItem item : shoppingListItems) {
-            Log.d(TAG, "Shopping List Item: " + item.getName());
+            Log.d(TAG, "Shopping List Item: " + item.getDescription());
         }
     }
     private void createGroceries() {
@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity  {
         masterList.add(new GroceryItem("Pop Tarts", 0, 0));
         masterList.add(new GroceryItem("Ice Cream", 0, 0));
         masterList.add(new GroceryItem("Cheetos", 0, 0));
-        masterList.add(new GroceryItem("Red Bull", 0,0));
+        masterList.add(new GroceryItem("Red Bull", 0, 0));
         masterList.add(new GroceryItem("AlmondJoy", 0,0));
         masterList.add(new GroceryItem( "MilkyWay", 0,0));
 
@@ -261,7 +261,7 @@ public class MainActivity extends AppCompatActivity  {
                         data[0],
                         Integer.parseInt(data[1]),
                         Integer.parseInt(data[2])));
-                Log.d(TAG, "ReadTextFile: " + masterList.get(masterList.size() - 1).getName());
+                Log.d(TAG, "ReadTextFile: " + masterList.get(masterList.size() - 1).getDescription());
             }
             Log.d(TAG, "ReadTextFile: " + masterList.size());
 

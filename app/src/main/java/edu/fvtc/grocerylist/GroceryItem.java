@@ -4,13 +4,13 @@ public class GroceryItem
 {
     //Variables
     private Integer Id;
-    private String Name;
+    private String Description;
     private Integer IsOnShoppingList;
     private Integer IsInCart;
 
-    public GroceryItem(String name, int isOnShoppingList, int isInCart)
+    public GroceryItem(String description, int isOnShoppingList, int isInCart)
     {
-        this.Name = name;
+        this.Description = description;
         this.IsOnShoppingList = isOnShoppingList;
         this.IsInCart = isInCart;
     }
@@ -23,12 +23,12 @@ public class GroceryItem
         Id = id;
     }
 
-    public String getName() {
-        return Name;
+    public String getDescription() {
+        return Description;
     }
 
-    public void setName(String name) {
-        Name = name;
+    public void setDescription(String description) {
+        Description = description;
     }
 
 
@@ -51,7 +51,7 @@ public class GroceryItem
 
 
     public String toString(){
-        return Name + "|" + IsOnShoppingList + "|" + IsInCart;
+        return Description + "|" + IsOnShoppingList + "|" + IsInCart;
     }
 
 

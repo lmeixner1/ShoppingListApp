@@ -16,8 +16,7 @@ import java.util.ArrayList;
 
 public class  GroceryAdapter extends RecyclerView.Adapter{
     private ArrayList<GroceryItem> groceryItemData;
-
-    private ArrayList<GroceryItem> checkedGroceries = new ArrayList<>();
+    private ArrayList<GroceryItem> shoppingListItems = new ArrayList<>();
     private View.OnClickListener onItemClickListener;
 
 
@@ -67,11 +66,6 @@ public class  GroceryAdapter extends RecyclerView.Adapter{
         parentContext = context;
     }
 
-    public ArrayList<GroceryItem> getCheckedGroceries()
-    {
-        return checkedGroceries;
-    }
-
     public void setOnItemClickListener(View.OnClickListener itemClickListener)
     {
         Log.d(TAG, "setOnItemClickListener: ");
@@ -90,7 +84,7 @@ public class  GroceryAdapter extends RecyclerView.Adapter{
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Log.d(TAG, "onBindViewHolder: " + groceryItemData.get(position));
         GroceryViewHolder groceryViewHolder = (GroceryViewHolder) holder;
-        groceryViewHolder.getTvGroceryName().setText(groceryItemData.get(position).getName());
+        groceryViewHolder.getTvGroceryName().setText(groceryItemData.get(position).getDescription());
 
         // Set the state of the CheckBox based on the item's properties
         groceryViewHolder.getCbIsOnShopList().setChecked(groceryItemData.get(position).getIsOnShoppingList() == 1);
