@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity  {
     public static final String XMLFILENAME = "data.xml";
 
     ArrayList<GroceryItem> masterList;
+    ArrayList<GroceryItem> shoppingListItems = new ArrayList<>();
 
     private boolean isShoppingListShown = false;
 
@@ -76,14 +77,9 @@ public class MainActivity extends AppCompatActivity  {
     private void ShowShoppingList() {
         isShoppingListShown = true; // used in dialog to determine what is being shown
 
-        if(isShoppingListShown == true)
-        {
-            //uncheck the checkboxes in the shoppingList
-        }
-
         Log.d(TAG, "ShowShoppingList: isShoppingListShown = " + isShoppingListShown);
 
-        ArrayList<GroceryItem> shoppingListItems = new ArrayList<>();
+
         for (GroceryItem item : masterList)
         {
             if (item.getIsOnShoppingList() == 1)
@@ -149,7 +145,7 @@ public class MainActivity extends AppCompatActivity  {
         else if (id == R.id.action_clear_all)
         {
             Log.d(TAG, "onOptionsItemSelected: " + item.getTitle());
-            //ClearAll();
+            ClearAll();
         } else {
             Log.d(TAG, "onOptionsItemSelected: " + item.getTitle());
             //DeleteChecked();
@@ -157,6 +153,15 @@ public class MainActivity extends AppCompatActivity  {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private void ClearAll() {
+        for (GroceryItem item : masterList)
+        {
+            item.setIsOnShoppingList(0);
+        }
+        ShowMasterList();
+    }
+
 
     private void addItemDialog() {
         LayoutInflater layoutInflater = LayoutInflater.from(this);

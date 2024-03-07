@@ -26,6 +26,12 @@ public class  GroceryAdapter extends RecyclerView.Adapter{
 
     private Context parentContext;
 
+    public void clearAllCheckboxes() {
+        for (GroceryItem item : groceryItemData) {
+            item.setIsOnShoppingList(0); // Set checkbox state to unchecked
+        }
+        notifyDataSetChanged(); // Notify adapter about the data change
+    }
 
     public class GroceryViewHolder extends RecyclerView.ViewHolder{
 
@@ -93,10 +99,7 @@ public class  GroceryAdapter extends RecyclerView.Adapter{
         groceryViewHolder.getCbIsOnShopList().setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                // Update the item's properties based on the CheckBox state
                 groceryItemData.get(position).setIsOnShoppingList(isChecked ? 1 : 0);
-
-                // Notify any listeners that the data has changed
                 notifyItemChanged(position);
             }
         });
