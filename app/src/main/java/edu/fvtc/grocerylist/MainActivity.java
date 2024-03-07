@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity  {
     ArrayList<GroceryItem> masterList;
 
     private boolean isShoppingListShown = false;
+
 
     private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
@@ -56,10 +58,12 @@ public class MainActivity extends AppCompatActivity  {
             groceries.add(groceryItem.toString());
         }
 
-        ShowMasterList();
 
+        ShowMasterList();
+        Log.d(TAG, "onCreate: isShoppingList Shown = " + isShoppingListShown);
     }
     private void ShowMasterList(){
+        Log.d(TAG, "ShowMasterList: isShoppingListShown = " + isShoppingListShown);
         //Bind the Recyclerview
         RecyclerView rvGroceries = findViewById(R.id.rvGrocerys);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
@@ -71,6 +75,13 @@ public class MainActivity extends AppCompatActivity  {
 
     private void ShowShoppingList() {
         isShoppingListShown = true; // used in dialog to determine what is being shown
+
+        if(isShoppingListShown == true)
+        {
+            //uncheck the checkboxes in the shoppingList
+        }
+
+        Log.d(TAG, "ShowShoppingList: isShoppingListShown = " + isShoppingListShown);
 
         ArrayList<GroceryItem> shoppingListItems = new ArrayList<>();
         for (GroceryItem item : masterList)
@@ -120,6 +131,7 @@ public class MainActivity extends AppCompatActivity  {
         if(id == R.id.action_showMasterList)
         {
             Log.d(TAG, "onOptionsItemSelected: " + item.getTitle());
+            isShoppingListShown = false;
             ShowMasterList();
         }
         else if (id == R.id.action_showShopList)
@@ -150,6 +162,7 @@ public class MainActivity extends AppCompatActivity  {
         LayoutInflater layoutInflater = LayoutInflater.from(this);
         final View addItemView = layoutInflater.inflate(R.layout.additem, null);
 
+        // Show the dialog to the user modularly
         new AlertDialog.Builder(this)
                 .setTitle(R.string.add_item)
                 .setView(addItemView)
@@ -163,6 +176,8 @@ public class MainActivity extends AppCompatActivity  {
                         if (isShoppingListShown)
                         {
                             masterList.add(new GroceryItem(item, 1, 0));
+                            ShowShoppingList();
+
                         } else
                         {
                             masterList.add(new GroceryItem(item, 0, 0));
@@ -171,16 +186,18 @@ public class MainActivity extends AppCompatActivity  {
 
                     }
                 })
-                .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Log.d(TAG, "onClick: Cancel");
-                    }
-                }).show();
+                .setNegativeButton(getString(R.string.cancel),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Log.d(TAG, "onClick: Cancel");
+                            }
+                        }).show();
+
     }
 
    private void SaveData() {
-       WriteTextFile();
+        WriteTextFile();
         WriteXMLFile();
    }
 
