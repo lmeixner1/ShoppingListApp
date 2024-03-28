@@ -21,9 +21,9 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity  {
     public static final String TAG = "MainActivity";
-    public static final String FILENAME = "data.txt";
+    public static final String FILENAME = "list.txt";
 
-    public static final String XMLFILENAME = "data.xml";
+    public static final String XMLFILENAME = "lis.xml";
 
     ArrayList<GroceryItem> masterList;
     ArrayList<GroceryItem> shoppingListItems = new ArrayList<>();
@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity  {
         createGroceries();
 
         ArrayList<String> groceries = new ArrayList<String>();
+        masterList = readMaster(this);
         for(GroceryItem groceryItem : masterList)
         {
             groceries.add(groceryItem.toString());
@@ -65,14 +66,17 @@ public class MainActivity extends AppCompatActivity  {
     }
 
     private void createGroceries() {
-
         masterList = new ArrayList<GroceryItem>();
-        masterList.add(new GroceryItem("Pop Tarts", 0, 0));
-        masterList.add(new GroceryItem("Ice Cream", 0, 0));
-        masterList.add(new GroceryItem("Cheetos", 0, 0));
-        masterList.add(new GroceryItem("Red Bull", 0, 0));
-        masterList.add(new GroceryItem("AlmondJoy", 0,0));
-        masterList.add(new GroceryItem( "MilkyWay", 0,0));
+
+        masterList.add(new GroceryItem(1,"Pop Tarts", 0, 0));
+        masterList.add(new GroceryItem(2,"Ice Cream", 0, 0));
+        masterList.add(new GroceryItem(3,"Cheetos", 0, 0));
+        masterList.add(new GroceryItem(4,"Red Bull", 0, 0));
+        masterList.add(new GroceryItem(5,"AlmondJoy", 0,0));
+        masterList.add(new GroceryItem( 6,"MilkyWay", 0,0));
+
+        FileIO.writeFile(FILENAME, this, createDataArray(masterList));
+        masterList = readMaster(this);
     }
     public boolean onCreateOptionsMenu(Menu menu)
     {
@@ -85,7 +89,7 @@ public class MainActivity extends AppCompatActivity  {
     {
         int id = item.getItemId();
 
-        if(id == R.id.action_showMasterList)
+      if(id == R.id.action_showMasterList)
         {
             setTitle("Master List");
             Log.d(TAG, "onOptionsItemSelected: " + item.getTitle());
@@ -103,7 +107,6 @@ public class MainActivity extends AppCompatActivity  {
         {
             Log.d(TAG, "onOptionsItemSelected: " + item.getTitle());
             addItemDialog();
-            SaveData();
         }
         else if (id == R.id.action_clear_all)
         {
@@ -112,7 +115,6 @@ public class MainActivity extends AppCompatActivity  {
         } else {
             Log.d(TAG, "onOptionsItemSelected: " + item.getTitle());
             DeleteChecked();
-            SaveData();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -208,12 +210,12 @@ public class MainActivity extends AppCompatActivity  {
 
                         if (isShoppingListShown)
                         {
-                            masterList.add(new GroceryItem(item, 1, 0));
+                            masterList.add(new GroceryItem(-1,item, 1, 0));
                             ShowShoppingList();
 
                         } else
                         {
-                            masterList.add(new GroceryItem(item, 0, 0));
+                            masterList.add(new GroceryItem(-1,item, 0, 0));
                             ShowMasterList();
                         }
 
@@ -229,73 +231,33 @@ public class MainActivity extends AppCompatActivity  {
 
     }
 
-    private void SaveData() {
-        WriteTextFile();
-        WriteXMLFile();
-    }
-
-    private void LoadData() {
-        ReadTextFile();
-        ReadXMLFile();
-    }
-    private void WriteXMLFile() {
-        try {
-            FileIO fileIO = new FileIO();
-            fileIO.WriteXMLFile(XMLFILENAME, this, masterList);
-            Log.d(TAG, "writeXMLFile: End");
-        }
-        catch(Exception e)
+    public static String[] createDataArray(ArrayList<GroceryItem> masterList)
+    {
+        String[] groceryData = new String[masterList.size()];
+        for(int count = 0; count < masterList.size(); count++)
         {
-            Log.d(TAG, "writeXMLFile: " + e.getMessage());
+            groceryData[count] = masterList.get(count).toString();
         }
+        return groceryData;
     }
 
-    private void ReadXMLFile() {
-        FileIO fileIO = new FileIO();
-        masterList = fileIO.ReadFromXmlFile(XMLFILENAME, this);
-        Log.d(TAG, "readXMLFile: Actors:" + masterList.size());
-    }
+    public static ArrayList<GroceryItem> readMaster(AppCompatActivity activity) {
+        ArrayList<String> strData = FileIO.readFile(FILENAME, activity);
+        ArrayList<GroceryItem> masterList1 = new ArrayList<GroceryItem>();
 
-    private void WriteTextFile() {
-        try{
-            FileIO fileIO = new FileIO();
-            int counter = 0;
-            String[] data = new String[masterList.size()];
-
-            for(GroceryItem groceryItem : masterList)
-            {
-                data[counter++] = groceryItem.toString();
-            }
-            fileIO.writeFile(FILENAME, this, data);
-
-        }
-        catch(Exception e)
+        for(String s : strData)
         {
-            Log.d(TAG, "WriteTextFile: " + e.getMessage());
+            Log.d(TAG, "readTeams: " + s);
+            String[] data = s.split("\\|");
+            masterList1.add(new GroceryItem(
+                    Integer.parseInt(data[0]),
+                    data[1],
+                    Integer.parseInt(data[2]),
+                    Integer.parseInt(data[3])
+            ));
         }
-    }
-
-
-    private void ReadTextFile() {
-        try {
-            FileIO fileIO = new FileIO();
-            ArrayList<String> strData = fileIO.readFile(FILENAME, this);
-
-            masterList = new ArrayList<GroceryItem>();
-
-            for (String s : strData) {
-                String[] data = s.split("\\|");
-                masterList.add(new GroceryItem(
-                        data[0],
-                        Integer.parseInt(data[1]),
-                        Integer.parseInt(data[2])));
-                Log.d(TAG, "ReadTextFile: " + masterList.get(masterList.size() - 1).getDescription());
-            }
-            Log.d(TAG, "ReadTextFile: " + masterList.size());
-
-        } catch (Exception e) {
-            Log.d(TAG, "ReadTextFile: " + e.getMessage());
-        }
+        Log.d(TAG, "readTeams: " + masterList1.size());
+        return masterList1;
     }
 
 }

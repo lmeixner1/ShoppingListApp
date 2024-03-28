@@ -21,7 +21,7 @@ import java.util.ArrayList;
 public class FileIO {
     public static final String TAG = "FileIOMethods";
 
-    public void writeFile(String filename,
+    public static void writeFile(String filename,
                           AppCompatActivity activity,
                           String[] items)
     {
@@ -49,7 +49,7 @@ public class FileIO {
         }
     }
 
-    public ArrayList<String> readFile(String filename, AppCompatActivity activity)
+    public static ArrayList<String> readFile(String filename, AppCompatActivity activity)
     {
         ArrayList<String> items = new ArrayList<String>();
 
@@ -77,7 +77,7 @@ public class FileIO {
 
     public ArrayList<GroceryItem> ReadFromXmlFile(String filename, AppCompatActivity activity)
     {
-        ArrayList<GroceryItem> actors = new ArrayList<GroceryItem>();
+        ArrayList<GroceryItem> masterList = new ArrayList<GroceryItem>();
         Log.d(TAG, "ReadFromXmlFile: Start");
 
         try{
@@ -91,11 +91,12 @@ public class FileIO {
                 if (xmlPullParser.getEventType() == XmlPullParser.START_TAG) {
                     if (xmlPullParser.getName().equals("actor")) {
                         Log.d(TAG, "ReadFromXmlFile: Start Grocery Parsing");
+                        int id = Integer.parseInt(xmlPullParser.getAttributeValue(null, "id"));
                         String groceryDescription = xmlPullParser.getAttributeValue(null, "groceryDescription");
                         int isOnShopList = Integer.parseInt(xmlPullParser.getAttributeValue(null, "isOnShoppingList"));
                         int isInCart = Integer.parseInt(xmlPullParser.getAttributeValue(null, "isInCart"));
-                        GroceryItem groceryItem = new GroceryItem(groceryDescription, isOnShopList, isInCart);
-                        actors.add(groceryItem);
+                        GroceryItem groceryItem = new GroceryItem(id, groceryDescription, isOnShopList, isInCart);
+                        masterList.add(groceryItem);
                         Log.d(TAG, "ReadFromXmlFile: " + groceryItem.toString());
                     }
                 }
@@ -108,12 +109,12 @@ public class FileIO {
         {
             Log.d(TAG, "ReadFromXmlFile: " + e.getMessage());
         }
-        return actors;
+        return masterList;
     }
 
     public void WriteXMLFile(String filename,
                              AppCompatActivity activity,
-                             ArrayList<GroceryItem> groceryItems)
+                             ArrayList<GroceryItem> MasterList)
     {
         try
         {
@@ -128,23 +129,25 @@ public class FileIO {
             serializer.setOutput(outputStreamWriter);
 
             serializer.startDocument("UTF-8", true);
-            serializer.startTag("","grocerys");
-            serializer.attribute("", "number", String.valueOf(groceryItems.size()));
+            serializer.startTag("","Teams");
+            serializer.attribute("", "number", String.valueOf(MasterList.size()));
 
-            for (GroceryItem groceryItem : groceryItems)
+            for (GroceryItem Grocery : MasterList)
             {
-                serializer.startTag("", "grocery");
-                serializer.attribute("", "id", String.valueOf(groceryItem.getId()));
-                serializer.attribute("", "groceryName", String.valueOf(groceryItem.getDescription()));
-                serializer.endTag("", "grocery");
+                serializer.startTag("", "Team");
+                serializer.attribute("", "id", String.valueOf(Grocery.getId()));
+                serializer.attribute("", "Description", String.valueOf(Grocery.getDescription()));
+                serializer.attribute("", "isOnShoppingList", String.valueOf(Grocery.getIsOnShoppingList()));
+                serializer.attribute("", "isInCart", String.valueOf(Grocery.getIsInCart()));
+                serializer.endTag("", "Groceries");
                 Log.d(TAG, "WriteXMLFile: ");
             }
 
-            serializer.endTag("","grocerys");
+            serializer.endTag("","MasterList");
             serializer.endDocument();
             serializer.flush();
             outputStreamWriter.close();
-            Log.d(TAG, "WriteXMLFile: Wrote" + groceryItems.size());
+            Log.d(TAG, "WriteXMLFile: Wrote" + MasterList.size());
             Log.d(TAG, "WriteXMLFile: End");
         }
         catch (Exception e)

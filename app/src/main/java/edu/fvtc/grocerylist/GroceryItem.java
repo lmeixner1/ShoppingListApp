@@ -3,24 +3,33 @@ package edu.fvtc.grocerylist;
 public class GroceryItem
 {
     //Variables
-    private Integer Id;
+    private int id;
     private String Description;
     private Integer IsOnShoppingList;
     private Integer IsInCart;
 
-    public GroceryItem(String description, int isOnShoppingList, int isInCart)
+    public GroceryItem()
     {
+        this.id = -1;
+        this.Description = "";
+        this.IsOnShoppingList = 0;
+        this.IsInCart = 0;
+
+    }
+    public GroceryItem(int id, String description, int isOnShoppingList, int isInCart)
+    {
+        this.id = id;
         this.Description = description;
         this.IsOnShoppingList = isOnShoppingList;
         this.IsInCart = isInCart;
     }
 
     public int getId() {
-        return Id;
+        return id;
     }
 
     public void setId(int id) {
-        Id = id;
+        id = id;
     }
 
     public String getDescription() {
@@ -49,7 +58,7 @@ public class GroceryItem
 
 
     public String toString(){
-        return Description + "|" + IsOnShoppingList + "|" + IsInCart;
+        return id+ "|"+ Description + "|" + IsOnShoppingList + "|" + IsInCart;
     }
 
 
