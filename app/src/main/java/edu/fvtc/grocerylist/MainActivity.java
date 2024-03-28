@@ -21,10 +21,10 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity  {
     public static final String TAG = "MainActivity";
-    public static final String FILENAME = "list.txt";
+    public static final String FILENAME = "masterlist.txt";
 
-    public static final String XMLFILENAME = "lis.xml";
-
+    GroceryItem groceryItem;
+    int groceryItemId = -1;
     ArrayList<GroceryItem> masterList;
     ArrayList<GroceryItem> shoppingListItems = new ArrayList<>();
 
@@ -51,33 +51,34 @@ public class MainActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        createGroceries();
-
         ArrayList<String> groceries = new ArrayList<String>();
         masterList = readMaster(this);
-        for(GroceryItem groceryItem : masterList)
-        {
-            groceries.add(groceryItem.toString());
-        }
+        if (masterList.size() == 0)
+            createGroceries();
 
 
-        ShowMasterList();
+        RebindGroceries();
         Log.d(TAG, "onCreate: isShoppingList Shown = " + isShoppingListShown);
     }
 
-    private void createGroceries() {
-        masterList = new ArrayList<GroceryItem>();
+    private void RebindGroceries() {
 
-        masterList.add(new GroceryItem(1,"Pop Tarts", 0, 0));
-        masterList.add(new GroceryItem(2,"Ice Cream", 0, 0));
-        masterList.add(new GroceryItem(3,"Cheetos", 0, 0));
-        masterList.add(new GroceryItem(4,"Red Bull", 0, 0));
-        masterList.add(new GroceryItem(5,"AlmondJoy", 0,0));
-        masterList.add(new GroceryItem( 6,"MilkyWay", 0,0));
-
-        FileIO.writeFile(FILENAME, this, createDataArray(masterList));
-        masterList = readMaster(this);
+        RecyclerView rvGroceries = findViewById(R.id.rvGrocerys);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        rvGroceries.setLayoutManager(layoutManager);
+        GroceryAdapter groceryAdapter = new GroceryAdapter(masterList, this);
+        groceryAdapter.setOnItemClickListener(onClickListener);
+        rvGroceries.setAdapter(groceryAdapter);
     }
+
+    private void initMaster(int itemId) {
+        //Get the groceryItems
+        masterList = readMaster(this);
+        //Get the item
+        groceryItem = masterList.get(itemId);
+        ShowMasterList();
+    }
+
     public boolean onCreateOptionsMenu(Menu menu)
     {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -95,6 +96,7 @@ public class MainActivity extends AppCompatActivity  {
             Log.d(TAG, "onOptionsItemSelected: " + item.getTitle());
             isShoppingListShown = false;
             ShowMasterList();
+            readMaster(this);
         }
         else if (id == R.id.action_showShopList)
         {
@@ -123,12 +125,7 @@ public class MainActivity extends AppCompatActivity  {
         setTitle("Master List");
         Log.d(TAG, "ShowMasterList: isShoppingListShown = " + isShoppingListShown);
         //Bind the Recyclerview
-        RecyclerView rvGroceries = findViewById(R.id.rvGrocerys);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        rvGroceries.setLayoutManager(layoutManager);
-        GroceryAdapter groceryAdapter = new GroceryAdapter(masterList, this);
-        groceryAdapter.setOnItemClickListener(onClickListener);
-        rvGroceries.setAdapter(groceryAdapter);
+       RebindGroceries();
     }
 
     private void ShowShoppingList() {
@@ -175,6 +172,7 @@ public class MainActivity extends AppCompatActivity  {
         } else {
             ShowMasterList();
         }
+        FileIO.writeFile(FILENAME, this, createDataArray(masterList));
     }
 
     private void ClearAll() {
@@ -193,9 +191,18 @@ public class MainActivity extends AppCompatActivity  {
     }
 
 
+
     private void addItemDialog() {
         LayoutInflater layoutInflater = LayoutInflater.from(this);
         final View addItemView = layoutInflater.inflate(R.layout.additem, null);
+
+        if(groceryItemId != -1)
+        {
+            //Get the groceryItem
+            initMaster(groceryItemId-1);
+        }else{
+            groceryItem = new GroceryItem();
+        }
 
         // Show the dialog to the user modularly
         new AlertDialog.Builder(this)
@@ -206,18 +213,24 @@ public class MainActivity extends AppCompatActivity  {
                     public void onClick(DialogInterface dialog, int which) {
                         Log.d(TAG, "onClick: Ok");
                         EditText etAddItem = addItemView.findViewById(R.id.etAddItem);
-                        String item = etAddItem.getText().toString();
 
-                        if (isShoppingListShown)
-                        {
-                            masterList.add(new GroceryItem(-1,item, 1, 0));
-                            ShowShoppingList();
 
-                        } else
+                        if (groceryItemId == -1)
                         {
-                            masterList.add(new GroceryItem(-1,item, 0, 0));
-                            ShowMasterList();
+                            groceryItem.setId(masterList.get(masterList.size()-1).getId() +1);
+                            groceryItem.setDescription(etAddItem.getText().toString());
+                            masterList.add(groceryItem);
+
+                            if (isShoppingListShown) {
+                                shoppingListItems.add(groceryItem);
+                            }
                         }
+                        else {
+                            masterList.set(groceryItemId-1, groceryItem);
+                        }
+
+                        FileIO.writeFile(FILENAME, MainActivity.this, MainActivity.createDataArray(masterList));
+
 
                     }
                 })
@@ -231,23 +244,26 @@ public class MainActivity extends AppCompatActivity  {
 
     }
 
-    public static String[] createDataArray(ArrayList<GroceryItem> masterList)
-    {
-        String[] groceryData = new String[masterList.size()];
-        for(int count = 0; count < masterList.size(); count++)
-        {
-            groceryData[count] = masterList.get(count).toString();
-        }
-        return groceryData;
-    }
+    private void createGroceries() {
+        masterList = new ArrayList<GroceryItem>();
 
+        masterList.add(new GroceryItem(1,"Pop Tarts", 0, 0));
+        masterList.add(new GroceryItem(2,"Ice Cream", 0, 0));
+        masterList.add(new GroceryItem(3,"Cheetos", 0, 0));
+        masterList.add(new GroceryItem(4,"Red Bull", 0, 0));
+        masterList.add(new GroceryItem(5,"AlmondJoy", 0,0));
+        masterList.add(new GroceryItem( 6,"MilkyWay", 0,0));
+
+        FileIO.writeFile(FILENAME, this, createDataArray(masterList));
+        masterList = readMaster(this);
+    }
     public static ArrayList<GroceryItem> readMaster(AppCompatActivity activity) {
         ArrayList<String> strData = FileIO.readFile(FILENAME, activity);
         ArrayList<GroceryItem> masterList1 = new ArrayList<GroceryItem>();
 
         for(String s : strData)
         {
-            Log.d(TAG, "readTeams: " + s);
+            Log.d(TAG, "readMaster: " + s);
             String[] data = s.split("\\|");
             masterList1.add(new GroceryItem(
                     Integer.parseInt(data[0]),
@@ -258,6 +274,16 @@ public class MainActivity extends AppCompatActivity  {
         }
         Log.d(TAG, "readTeams: " + masterList1.size());
         return masterList1;
+    }
+
+    public static String[] createDataArray(ArrayList<GroceryItem> masterList)
+    {
+        String[] groceryData = new String[masterList.size()];
+        for(int count = 0; count < masterList.size(); count++)
+        {
+            groceryData[count] = masterList.get(count).toString();
+        }
+        return groceryData;
     }
 
 }
